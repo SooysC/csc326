@@ -1,11 +1,45 @@
 <!DOCTYPE html>
 <html>
 <body>
+<!-- TODO: For some reason adding an external javascript file isn't working, will fix it later-->
+<!--script type="text/javascript" src="../javascript/listeners.js"></script-->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+// Implement all onclick listeners here
+function sendSearchQuery(){
+	var queryString = document.getElementById("keyword").value;
+	/*
+	var options = {
+				host: "localhost",
+				port: 8080,
+				path: '/',
+				method: 'POST'
+	};*/
+	console.log(queryString);
+	var postData = JSON.stringify(queryString);
+	console.log(postData);
+	/*
+	var searchRequest = http.request(options, function(searchResponse) {
+		alert('POST request successful');
+	});
+	*/
+	$.ajax({
+	    type: "POST",
+	    url: 'http://localhost:8080/',
+	    data: postData,
+	    dataType: 'jsonp',
+	    contentType: "application/json",
+	    success: function(data) {
+	    	console.log(data);
+      		console.log('Success'); 
+    	}
+	});
+} 
 
+
+</script>
 <h1>My Search Engine</h1>
-
-
-<input type="text" id="searchBox"><br>
-<button type="button" id="searchButton" onclick="console.log('Search Button working')">Search</button>
+<input type="text" id="keyword" name="keyword"><br>
+<button type="button" id="searchButton" onclick="sendSearchQuery(); return false;">Search</button>
 </body>
 </html>
