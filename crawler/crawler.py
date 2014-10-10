@@ -344,13 +344,15 @@ class crawler(object):
 
     def get_inverted_index(self):
         """Get the inverted index"""
-        self.crawl()
+        if not self._inverted_index_cache:
+            self.crawl()
         return self._inverted_index_cache
 
 
     def get_resolved_inverted_index(self):
         """Get the resolved inverted index"""
-        self.crawl()
+        if not self._resolved_inverted_index_cache:
+            self.crawl()
         return self._resolved_inverted_index_cache
 
 
