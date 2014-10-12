@@ -1,4 +1,10 @@
 csc326
 ======
 
-Rebuilding Google!
+### To Run:
+1. run `python csc326/bottle-0.12.7/feServer.py`
+1. go to `http://localhost:8080/`
+
+### brought to you by team 25 of CSC326:
+1. Samprit Raihan (raihansa)
+1. Jon Erik Suero (suerojon)
