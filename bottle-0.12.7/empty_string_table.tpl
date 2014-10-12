@@ -17,12 +17,6 @@
 	    <td>Word</td>
 	    <td>Count</td>
    	</tr>
-%for key, value in wordList.iteritems():
-    <tr>
-        <td>{{key}} </td>
-        <td>{{value}} </td>
-    </tr>	
-%end
 </table>
 
 <h4>History</h4>
