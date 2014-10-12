@@ -9,30 +9,35 @@ current_dictionary = dict()
 current_dictionary = {}
 popular = list()
 
-@route('/', method = 'GET')	
-def returnHomePage():
-	filename = "index.html"	
-	return static_file(filename, root='../html/')
-
-@route('/', method = 'POST')
+@route('/', method = 'GET')
 def processQuery():
 	global dictionary
 	global current_dictionary
 	global popular
-	keywords =  request.forms.get('keywords')
+	print 'processQuery'
 	
+	keywords =  request.query_string
+	
+	print 'keywords--->', keywords
 	if keywords == "":
+		# return the home page
+		print 'Gonna return the home page'
 		output = template('empty_string_table', popularWords=popular)
 		return output
 	
-	elif keywords is not None and keywords:
+	elif keywords is not None and keywords:		
+		# We may need to do some search
 		print 'keywords:', keywords
-		
 		# tokenize keywords 
-		currentKeywordList = keywords.split(' ')
+		currentKeywordList = keywords.split('=')
+		print 'Current keywords after splitting ''='':', currentKeywordList
+		currentKeywordList = currentKeywordList[1].split('+')
+		# Split this one more time by ignoring all empty strings
+		currentKeywordList = [w for w in currentKeywordList if w != '']
 		current_dictionary = {}
-		print 'Current keywords:', currentKeywordList
+		print 'NOW! Current keywords:', currentKeywordList
 		
+		# By this time, we should be done splitting for good
 		# and throw them into dictionary
 		for word in currentKeywordList:
 			if word in dictionary:
@@ -55,6 +60,7 @@ def processQuery():
 		output = template('make_table', wordList=current_dictionary, popularWords=popular)
 		return output
 	else:
+		print 'In the else clause, nothing to do, just return home page'	
 		output = template('empty_string_table', popularWords=popular)
 		return output
 

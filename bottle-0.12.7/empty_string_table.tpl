@@ -5,9 +5,9 @@
 
 <img src="http://img.wikinut.com/img/1mpdglbma_q7fudr/jpeg/724x5000/Ding.jpeg" alt="Ding" style="width:200px;height:100px">
 <h1>Ding: Because who uses Bing?</h1>
-<form name="searchForm" action="" method="post">
+<form name="searchForm" action="" method="get">
 	<input type="text" name="keywords"><br>
-	<button type="submit" name="searchButton" value="search">Search</button>    
+	<input value="Search It" id="searchButton" type="submit" />   
 </form>
 
 <h4>Results</h4>
