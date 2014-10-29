@@ -22,7 +22,7 @@ def processQuery():
 	if keywords == "":
 		# return the home page
 		print 'Gonna return the home page'
-		output = template('empty_string_table', popularWords=popular)
+		output = template('./empty_string_table', popularWords=popular)
 		return output
 	
 	elif keywords is not None and keywords:		
