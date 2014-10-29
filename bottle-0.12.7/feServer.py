@@ -1,7 +1,10 @@
 from bottle import route, run
 from bottle import static_file
 from bottle import get, post, request, template, debug
+from bottle import TEMPLATE_PATH
 import operator
+
+TEMPLATE_PATH.insert(0,'./')
 
 # Global in-memory store of the keywords that come in
 dictionary = dict()
@@ -15,20 +18,20 @@ def processQuery():
 	global current_dictionary
 	global popular
 	print 'processQuery'
-	
+
 	keywords =  request.query_string
-	
+
 	print 'keywords--->', keywords
 	if keywords == "":
 		# return the home page
 		print 'Gonna return the home page'
-		output = template('./empty_string_table', popularWords=popular)
+		output = template('empty_string_table', popularWords=popular)
 		return output
-	
-	elif keywords is not None and keywords:		
+
+	elif keywords is not None and keywords:
 		# We may need to do some search
 		print 'keywords:', keywords
-		# tokenize keywords 
+		# tokenize keywords
 		currentKeywordList = keywords.split('=')
 		print 'Current keywords after splitting ''='':', currentKeywordList
 		currentKeywordList = currentKeywordList[1].split('+')
@@ -36,7 +39,7 @@ def processQuery():
 		currentKeywordList = [w for w in currentKeywordList if w != '']
 		current_dictionary = {}
 		print 'NOW! Current keywords:', currentKeywordList
-		
+
 		# By this time, we should be done splitting for good
 		# and throw them into dictionary
 		for word in currentKeywordList:
@@ -47,9 +50,9 @@ def processQuery():
 			else:
 				dictionary[word] = 1
 				current_dictionary[word] = dictionary[word]
-		
+
 		sorted_dictionary = sorted(dictionary.items(), key=operator.itemgetter(1))
-		popular = list(reversed(sorted_dictionary))		
+		popular = list(reversed(sorted_dictionary))
 		popular = popular[:20]
 		# Just printing out some data on server side for debugging purposes
 		print 'Dictionary is:', dictionary
@@ -60,9 +63,10 @@ def processQuery():
 		output = template('make_table', wordList=current_dictionary, popularWords=popular)
 		return output
 	else:
-		print 'In the else clause, nothing to do, just return home page'	
+		print 'In the else clause, nothing to do, just return home page'
 		output = template('empty_string_table', popularWords=popular)
 		return output
 
 run(host = 'localhost', port = 8080, debug = True)
+#run(host='0.0.0.0', port = 80) # for AWS EC2
 
