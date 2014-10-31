@@ -8,7 +8,10 @@
 <form name="searchForm" action="" method="get">
 	<input type="text" name="keywords"><br>
 	<input value="Search It" id="searchButton" type="submit" />
-	
+</form>
+
+<form name="signOutForm" method="get" action="https://accounts.google.com/logout">  
+    <input type="submit" name="signOutButton" value="signOut"/>  
 </form>
 
 <h4>Results</h4>

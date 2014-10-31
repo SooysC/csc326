@@ -2,12 +2,18 @@
 <!DOCTYPE html>
 <html>
 <body>
-
 <img src="http://img.wikinut.com/img/1mpdglbma_q7fudr/jpeg/724x5000/Ding.jpeg" alt="Ding" style="width:200px;height:100px">
-<h1>Ding: Because who uses Bing?</h1>
+<h1>Ding</h1>
 <form name="searchForm" action="" method="get">
 	<input type="text" name="keywords"><br>
 	<input value="Search It" id="searchButton" type="submit" />   
+</form>
+
+<form name="signInForm" method="get" action="">  
+  <input type="submit" name="signInButton" value="signIn"/>  
+</form> 
+<form name="signOutForm" method="get" action="https://accounts.google.com/logout">  
+  <input type="submit" name="signOutButton" value="signOut"/>  
 </form>
 
 <h4>Results</h4>
