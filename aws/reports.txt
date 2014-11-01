@@ -1,0 +1,5 @@
+1. While running 'ab -n 1000 -c 50 http://ec2-54-173-22-59.compute-1.amazonaws.com/?keywords=helloworld+foo+bar'
+a total of 975 requests completed
+2. Utilization of CPU = 10%
+3. Disk I/O = 0
+4. Network at max performance = 955231.2

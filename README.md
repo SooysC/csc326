@@ -12,6 +12,9 @@ csc326
 1. go to csc326/aws/
 2. run 'python csc326/aws/lab2_aws_setup.py'
 
+### To view the benchmark reports,
+1. go to csc326/aws/
+2. run 'vim reports.txt'
 ### brought to you by team 25 of CSC326:
 1. Samprit Raihan (raihansa)
 1. Jon Erik Suero (suerojon)
