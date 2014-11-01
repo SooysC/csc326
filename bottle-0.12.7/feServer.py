@@ -11,10 +11,7 @@ from beaker.middleware import SessionMiddleware
 TEMPLATE_PATH.insert(0,'./')
 
 search_history = {}
-current_user_history = {}
-recent = []
 
-s = None
 session_opts = {
 	    'session.type': 'file',
 	    'session.cookie_expires': 300,
@@ -26,7 +23,6 @@ app = SessionMiddleware(bottle.app(), session_opts)
 @route('/oauth2callback') 
 def redirect_page():
 	code = request.query.get('code', '')
-
 	with open("client_secrets.json") as json_file:
 		client_secrets = json.load(json_file)
 		CLIENT_ID = client_secrets["web"]["client_id"]		
@@ -50,14 +46,24 @@ def redirect_page():
 	user_email = user_document['email']
 
 	# Create a beaker session
-	global s
 	s = request.environ.get('beaker.session')
 	s['user_email'] = user_email
 	s.save()
 	bottle.redirect('/')
-
+	# Just serve the signed_in_results page
+	'''
+	output = template( 'signed_in_results', 
+						wordList = None, #dict 
+						popularWords = None, #list
+						user_email = user_email
+					 )
+	return output
+	'''
 @route('/', method = 'GET')
 def processQuery():
+	# get session
+	session = request.environ.get('beaker.session')
+
 	print 'processQuery'
 	keywords =  request.query_string
 	urlparams = request.query_string
@@ -66,9 +72,13 @@ def processQuery():
 	if urlparams == "":
 		# return the home page
 		print 'Gonna return the home page'
-		output = template('homepage')
+		try:
+			email = session['user_email']
+		except:
+			email = ''
+		output = template('homepage', user_email = email)
 		return output
-	# The URL params contain something, distinguish if it's a search or a sign in
+
 	elif urlparams is not None and urlparams:
 		query = urlparams.split('=')
 		# Index 0 is queryType, and Index 1 is queryParams
@@ -90,7 +100,7 @@ def processQuery():
 		if queryType == "signOutButton" and queryParams == "signOut":
 			# We need to sign out
 			print 'signOut..........'
-			s.delete()
+			session.delete()
 			#bottle.redirect('https://accounts.google.com/logout')
 			bottle.redirect('/')
 		if queryType == "keywords":			
@@ -100,49 +110,40 @@ def processQuery():
 			currentKeywordList = [w for w in currentKeywordList if w != '']
 			print 'Current keywords:', currentKeywordList
 			
-			# Determine signed up mode vs anon mode		
-			try:
-				user_email = s['user_email']
+
+			is_signed_in = 'user_email' in session
+			if is_signed_in:
+				user_email = session['user_email']
+
+			if is_signed_in:
+				##### user is signed in and user_email is the user's email
 				print 'User email is:', user_email
 				# signed up mode
 				print 'signed up mode...........'
 				current_user_results = {}
-				global search_history, current_user_history, recent
-				#print 'Before all recent', recent
+				global search_history
 				for word in currentKeywordList:
 					if word in current_user_results:
 						current_user_results[word] = current_user_results[word] + 1
 					else:
 						current_user_results[word] = 1
 
+				if user_email not in search_history:
+					search_history.update({user_email:[]})
+
 				for word in currentKeywordList:
-					recent.append(word)
+					search_history[user_email].append(word)
 
-				print 'current user results', current_user_results				
-
-				if recent is None:
-					print 'recent is empty'
-				if len(recent) < 10:
-					#print 'recent', recent
-					most_recent = recent[:len(recent)]
-					#print 'less than 10'
-				else:
-					most_recent = recent[-10:]
-					#print 'more than 10'
-				print 'most_recent:', most_recent
-				search_history[user_email] = [current_user_results, most_recent]
-				print '_' * 10
-				print 'Search History:'
-				print '_' * 10
-				print search_history
-				print '_' * 10
+				history = search_history[user_email][-10:]
 
 				output = template( 'signed_in_results', 
-									wordList = search_history[user_email][0], #dict 
-									popularWords = search_history[user_email][1] #list
+									wordList = current_user_results, #dict 
+									popularWords = history, #list
+									user_email = user_email
 								 )
 				return output
-			except:
+			else:
+				##### not signed in, user_email should not be referenced
 				# anon mode
 				print 'Anon mode........'
 				anon_results = {}
@@ -152,11 +153,17 @@ def processQuery():
 					else:
 						anon_results[word] = 1
 				# Need to display the current set of input keywords, and the count of those keywords
-				output = template('anon_results', wordList=anon_results)
-				return output
+
+
+				output = template('anon_results', wordList = anon_results, user_email = '')
+				return output				
 	else:
 		print 'In the else clause, nothing to do, just return home page'
-		output = template('homepage')
+		try:
+			email = session['user_email']
+		except:
+			email = ''
+		output = template('homepage', user_email = email)
 		return output
 
 run(app = app, host = 'localhost', port = 8080, debug = True)

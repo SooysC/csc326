@@ -9,7 +9,13 @@
 	<input type="text" name="keywords"><br>
 	<input value="Search It" id="searchButton" type="submit" />
 </form>
-
+%if user_email == '':
+    <form name="signInForm" method="get" action="">  
+        <input type="submit" name="signInButton" value="signIn"/>  
+    </form> 
+%else:
+    <h2> Hello {{user_email}} <h2>
+%end
 <h4>Results</h4>
 
 <table border="1" id="results">
