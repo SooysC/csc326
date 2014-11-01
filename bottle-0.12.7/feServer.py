@@ -30,10 +30,10 @@ def redirect_page():
 		SCOPE = client_secrets["web"]["auth_uri"]
 		REDIRECT_URI = client_secrets["web"]["redirect_uris"]
 	
-	flow = OAuth2WebServerFlow(client_id = '547843285800-lr7jojdv25gec092j0aqlc205m35bl2k.apps.googleusercontent.com', 
-                            client_secret = 'WOgP3CpvfEsQ_epZpHa_g2D5', 
+	flow = OAuth2WebServerFlow(client_id = CLIENT_ID, 
+                            client_secret = CLIENT_SECRET, 
                             scope = 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email', 
-                            redirect_uri = 'http://localhost:8080/oauth2callback') 
+                            redirect_uri = 'http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback') 
 	
 	
 	credentials = flow.step2_exchange(code)
@@ -92,7 +92,7 @@ def processQuery():
 			# TODO Eventually we should return a tpl file with the proper layout, but forget that for now
 			flow = flow_from_clientsecrets('client_secrets.json', 
 											scope='https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email', 
-											redirect_uri='http://localhost:8080/oauth2callback')
+											redirect_uri='http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback')
 			uri = flow.step1_get_authorize_url() 
 			#print uri
 			bottle.redirect(str(uri)) 
@@ -166,5 +166,5 @@ def processQuery():
 		output = template('homepage', user_email = email)
 		return output
 
-run(app = app, host = 'localhost', port = 8080, debug = True)
-#run(host='0.0.0.0', port = 80) # for AWS EC2
+#run(app = app, host = 'localhost', port = 8080, debug = True)
+run(app = app, host='0.0.0.0', port = 80) # for AWS EC2
