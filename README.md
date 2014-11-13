@@ -3,7 +3,7 @@ csc326
 
 ### To Run:
 1. run `python csc326/bottle-0.12.7/feServer.py`
-1. go to `http://54.173.22.59:8080/`
+1. go to `http://54.173.22.59/`
 
 ### To Test `crawler.py`
 1. run `python csc326/crawler/crawler_tester.py`

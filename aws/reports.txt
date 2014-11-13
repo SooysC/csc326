@@ -1,5 +1,53 @@
-1. While running 'ab -n 1000 -c 50 http://ec2-54-173-22-59.compute-1.amazonaws.com/?keywords=helloworld+foo+bar'
-a total of 975 requests completed
-2. Utilization of CPU = 10%
-3. Disk I/O = 0
-4. Network at max performance = 955231.2
+# While running 'ab -n 1000 -c 50 http://ec2-54-173-22-59.compute-1.amazonaws.com/?keywords=helloworld+foo+bar'
+ total of 975 requests completed
+# Utilization of CPU = 10%
+# Disk I/O = 0
+# Network at max performance = 955231.2
+
+# Maximum number of connections that can be handled by the server before any 
+connection drops is 200.
+
+#Maximum number of requests per second (RPS) that can be sustained by the server 
+when operating with maximum number of connections is 63.04.  
+
+
+ab -n 200 -c 10 http://ec2-54-173-22-59.compute-1.amazonaws.com/
+
+This is ApacheBench, Version 2.3 <$Revision: 1554214 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+Benchmarking ec2-54-173-22-59.compute-1.amazonaws.com (be patient)
+Completed 100 requests
+Completed 200 requests
+Finished 200 requests
+Server Software:        WSGIServer/0.1
+Server Hostname:        ec2-54-173-22-59.compute-1.amazonaws.com
+Server Port:            80
+Document Path:          /
+Document Length:        467 bytes
+Concurrency Level:      10
+Time taken for tests:   3.173 seconds
+Complete requests:      200
+Failed requests:        0
+Total transferred:      146600 bytes
+HTML transferred:       93400 bytes
+Requests per second:    63.04 [#/sec] (mean)
+Time per request:       158.631 [ms] (mean)
+Time per request:       15.863 [ms] (mean, across all concurrent requests)
+Transfer rate:          45.12 [Kbytes/sec] received
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       20   34  44.4     21     224
+Processing:    22  123 420.1     25    2831
+Waiting:       22  123 420.1     24    2831
+Total:         43  157 437.9     46    3055
+Percentage of the requests served within a certain time (ms)
+  50%     46
+  66%     56
+  75%     74
+  80%     75
+  90%     90
+  95%   1569
+  98%   1730
+  99%   2819
+ 100%   3055 (longest request)
