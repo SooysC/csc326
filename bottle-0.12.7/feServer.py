@@ -8,6 +8,18 @@ import operator
 import httplib2
 from beaker.middleware import SessionMiddleware
 
+# crawler db
+import sys
+
+sys.path.insert(0, '../crawler/')
+import crawler_db
+
+###################################### For Samprit:
+# to get an array of urls, use:
+# crawler_db.get_sorted_urls("word")
+######################################
+
+
 TEMPLATE_PATH.insert(0,'./')
 
 search_history = {}
