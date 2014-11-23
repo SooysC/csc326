@@ -36,7 +36,7 @@ from bottle import error
 @error(404)
 def error404(error):
 	output - template('error_page')
-    return output
+	return output
 
 @route('/oauth2callback') 
 def redirect_page():
@@ -51,7 +51,9 @@ def redirect_page():
 	flow = OAuth2WebServerFlow(client_id = CLIENT_ID, 
                             client_secret = CLIENT_SECRET, 
                             scope = 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email', 
-                            redirect_uri = 'http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback') 
+                            redirect_uri = 'http://localhost:8080/oauth2callback'
+                            #redirect_uri = 'http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback'
+                            ) 
 	
 	
 	credentials = flow.step2_exchange(code)
@@ -81,7 +83,7 @@ def redirect_page():
 sorted_url_list = []
 num_pages = 0
 page_num = 1
-url_per_page = 10
+url_per_page = 3
 @route('/', method = 'GET')
 def processQuery():
 	# get session
@@ -115,7 +117,9 @@ def processQuery():
 			print "Signin............"
 			flow = flow_from_clientsecrets('client_secrets.json', 
 											scope='https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email', 
-											redirect_uri='http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback')
+											redirect_uri = 'http://localhost:8080/oauth2callback'
+											#redirect_uri='http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback'
+											)
 			uri = flow.step1_get_authorize_url() 
 			#print uri
 			bottle.redirect(str(uri)) 
@@ -140,7 +144,11 @@ def processQuery():
 				first_word = currentKeywordList[0]
 			if first_word == '':
 				# return home page, not current
-				output = template('homepage', user_email = '')
+				try:
+					email = session['user_email']
+				except:
+					email = ''
+				output = template('homepage', user_email = email)
 				return output 
 				
 			# reset page number and total number of result pages for every new search
@@ -179,6 +187,10 @@ def processQuery():
 				num_pages = len(sorted_url_list) / url_per_page
 				if len(sorted_url_list) % url_per_page != 0:
 					num_pages = num_pages + 1
+
+				print 'page_num:', page_num
+				print 'num_pages:', num_pages
+				#print 'user_email:', user_email
 				'''
 				output = template( 'signed_in_results', 
 									wordList = current_user_results, #dict 
@@ -187,10 +199,11 @@ def processQuery():
 								 )
 				'''
 				output = template(	'search_results', 
-									url_list = sorted_url_list,
+									url_list = sorted_url_list[:url_per_page],
 									page_num = page_num, 
 									list_size = len(sorted_url_list), 
-									num_pages = num_pages
+									num_pages = num_pages,
+									user_email = user_email
 								)
 				return output
 			else:
@@ -222,7 +235,8 @@ def processQuery():
 									url_list = sorted_url_list[:url_per_page], 
 									page_num = page_num, 
 									list_size = len(sorted_url_list), 
-									num_pages = num_pages
+									num_pages = num_pages,
+									user_email = ''
 								)
 				return output
 		if queryType == "next":
@@ -232,12 +246,17 @@ def processQuery():
 			print 'page_num:', page_num
 			print 'num_pages:', num_pages
 			
+			try:
+				email = session['user_email']
+			except:
+				email = ''
 			if page_num <= num_pages:
 				output = template(	'search_results', 
 									url_list = sorted_url_list[(page_num - 1) * url_per_page : (page_num - 1) * url_per_page + url_per_page], 
 									page_num = page_num, 
 									list_size = len(sorted_url_list), 
-									num_pages = num_pages
+									num_pages = num_pages,
+									user_email = email
 								)
 				return output
 		if queryType == "prev" and page_num > 0:
@@ -247,16 +266,26 @@ def processQuery():
 			print 'page_num:', page_num
 			print 'num_pages:', num_pages
 
+			try:
+				email = session['user_email']
+			except:
+				email = ''
+
 			if page_num > 0:
 				output = template(	'search_results', 
 									url_list = sorted_url_list[(page_num - 1) * url_per_page : (page_num - 1) * url_per_page + url_per_page], 
 									page_num = page_num, 
 									list_size = len(sorted_url_list), 
-									num_pages = num_pages
+									num_pages = num_pages,
+									user_email = email
 								)
 				return output
 		if queryType == "home":
-			output = template('homepage', user_email = '')
+			try:
+				email = session['user_email']
+			except:
+				email = ''
+			output = template('homepage', user_email = email)
 			return output
 
 	else:

@@ -13,10 +13,13 @@
 %if user_email == '':
 	<form name="signInForm" method="get" action="">  
 		<!--input type="submit" name="signInButton" value="signIn"/-->
-		<!--button type="submit" id="signInButton" name="signInButton" value="signIn">Sign in</button-->
+		<button type="submit" id="signInButton" name="signInButton" value="signIn">Sign in</button>
 	</form> 
 %else:
 	<h2> Hello {{user_email}} <h2>
+	<form name="signOutForm" method="get" action="">
+        <button type="submit" id="signOutButton" name="signOutButton" value="signOut">Sign Out</button> 
+    </form>
 %end
 </body>
 </html>
