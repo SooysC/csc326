@@ -1,9 +1,12 @@
+### brought to you by team 25 of CSC326:
+1. Samprit Raihan (raihansa)
+1. Jon Erik Suero (suerojon)
+
+
 #######################################
 # Comparison:
 #######################################
 With 1000 requests, Lab3 performed worse (with only 545 requests completed) than Lab2 (wth 975 completed). This is because Lab3 needs to access the database for every request which takes time and causes traffic. On the other hand, Lab3 can handle 250 more connections than Lab2 before any connection drops. Also, Lab3 has better maximum number of requests per second of 80.58. This is because Lab3 does not rely as much on memory; it relies more on the database. This causes Lab3 to be more stable with smaller amount of requests. Since Lab3 accesses a SQLite file to read the database, the Disk TPS and Disk Reads increased.
-
-
 
 
 
