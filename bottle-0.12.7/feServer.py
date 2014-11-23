@@ -32,6 +32,12 @@ session_opts = {
 }
 app = SessionMiddleware(bottle.app(), session_opts)
 
+from bottle import error
+@error(404)
+def error404(error):
+	output - template('error_page')
+    return output
+
 @route('/oauth2callback') 
 def redirect_page():
 	code = request.query.get('code', '')
