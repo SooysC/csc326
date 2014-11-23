@@ -83,7 +83,7 @@ def redirect_page():
 sorted_url_list = []
 num_pages = 0
 page_num = 1
-url_per_page = 3
+url_per_page = 10
 @route('/', method = 'GET')
 def processQuery():
     # get session
