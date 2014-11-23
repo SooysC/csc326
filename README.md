@@ -5,12 +5,12 @@ csc326
 1. run `python csc326/bottle-0.12.7/feServer.py`
 1. go to `http://54.173.22.59/`
 
-### To Test `crawler.py`
-1. run `python csc326/crawler/crawler_tester.py`
+### To Test `crawler.py` and `crawler_db.py`
+1. `cd csc326/crawler/`
+1. run `python crawler_tester.py`
 
 ### To crawl:
 1. `cd csc326/crawler/`
-1. `rm dbFile.db`
 1. run `python crawler.py`
 
 ### To run the AWS initialization scirpt:

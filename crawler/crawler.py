@@ -23,6 +23,7 @@ import urllib2
 import urlparse
 from BeautifulSoup import *
 from collections import defaultdict
+import os
 import re
 import sqlite3 as lite
 from pagerank import page_rank
@@ -154,9 +155,10 @@ class crawler(object):
 
     def insert_pagerank_to_db(self):
         """ Insert rankings of pages/documents to database"""
-        rankings = page_rank(self._links_cache)
-        for doc_id, doc_rank in rankings.iteritems():
-            self._db_cursor.execute('INSERT INTO PageRank(doc_id, doc_rank) VALUES (%d, %f);' % (doc_id, doc_rank) )
+        if len(self._links_cache) > 0:
+            rankings = page_rank(self._links_cache)
+            for doc_id, doc_rank in rankings.iteritems():
+                self._db_cursor.execute('INSERT INTO PageRank(doc_id, doc_rank) VALUES (%d, %f);' % (doc_id, doc_rank) )
 
     def insert_inververted_index_to_db(self):
         """ Insert rankings of pages/documents to database"""
@@ -374,6 +376,12 @@ class crawler(object):
         return self._links_cache
 
 if __name__ == "__main__":
+    # remove db file first
+    try:
+        os.remove("dbFile.db")
+    except:
+        pass
+
     db_conn = lite.connect("dbFile.db")
     bot = crawler(db_conn, "urls.txt")
     bot.crawl(depth=1)
