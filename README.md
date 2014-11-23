@@ -1,8 +1,9 @@
 csc326
 ======
 
-### To Run:
-1. run `python csc326/bottle-0.12.7/feServer.py`
+### To Run
+1. `cd csc326/bottle-0.12.7/`
+1. run `python feServer.py`
 1. go to `http://54.173.22.59/`
 
 ### To Test `crawler.py` and `crawler_db.py`
