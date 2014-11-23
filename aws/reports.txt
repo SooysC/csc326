@@ -1,3 +1,92 @@
+#######################################
+# Comparison:
+#######################################
+With 1000 requests, Lab3 performed worse (with only 545 requests completed) than Lab2 (wth 975 completed). This is because Lab3 needs to access the database for every request which takes time and causes traffic. On the other hand, Lab3 can handle 250 more connections than Lab2 before any connection drops. Also, Lab3 has better maximum number of requests per second of 80.58. This is because Lab3 does not rely as much on memory; it relies more on the database. This causes Lab3 to be more stable with smaller amount of requests. Since Lab3 accesses a SQLite file to read the database, the Disk TPS and Disk Reads increased.
+
+
+
+
+
+#######################################
+# LAB 3
+#######################################
+
+# While running 'ab -n 1000 -c 50 http://ec2-54-173-22-59.compute-1.amazonaws.com/?keywords=helloworld+foo+bar'
+ total of 545 requests completed
+
+# Utilization of CPU = 15.12%
+# Disk TPS (Transaction per Second) = 0.10
+# Disk Reads = 0.17 kB/s
+
+# Network In: 181084.8
+# Network Out: 385225.2
+
+# Maximum number of connections that can be handled by the server before any 
+connection drops is 450.
+
+#Maximum number of requests per second (RPS) that can be sustained by the server 
+when operating with maximum number of connections is 80.58. 
+
+
+This is ApacheBench, Version 2.3 <$Revision: 1554214 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking ec2-54-173-22-59.compute-1.amazonaws.com (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Finished 450 requests
+
+
+Server Software:        WSGIServer/0.1
+Server Hostname:        ec2-54-173-22-59.compute-1.amazonaws.com
+Server Port:            80
+
+Document Path:          /?keywords=engineering
+Document Length:        2336 bytes
+
+Concurrency Level:      10
+Time taken for tests:   5.585 seconds
+Complete requests:      450
+Failed requests:        0
+Total transferred:      1171350 bytes
+HTML transferred:       1051200 bytes
+Requests per second:    80.58 [#/sec] (mean)
+Time per request:       124.108 [ms] (mean)
+Time per request:       12.411 [ms] (mean, across all concurrent requests)
+Transfer rate:          204.82 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:       34   57  95.7     44    1287
+Processing:    42   65  35.2     55     477
+Waiting:       36   60  35.2     50     473
+Total:         77  122 104.2    109    1417
+
+Percentage of the requests served within a certain time (ms)
+  50%    109
+  66%    120
+  75%    126
+  80%    129
+  90%    144
+  95%    161
+  98%    202
+  99%    462
+ 100%   1417 (longest request)
+
+
+
+
+
+
+
+
+#######################################
+# LAB 2
+#######################################
+
 # While running 'ab -n 1000 -c 50 http://ec2-54-173-22-59.compute-1.amazonaws.com/?keywords=helloworld+foo+bar'
  total of 975 requests completed
 # Utilization of CPU = 10%
@@ -11,7 +100,7 @@ connection drops is 200.
 when operating with maximum number of connections is 63.04.  
 
 
-ab -n 200 -c 10 http://ec2-54-173-22-59.compute-1.amazonaws.com/
+ab -n 200 -c 10 http://ec2-54-173-22-59.compute-1.amazonaws.com/?keywords=helloworld+foo+bar
 
 This is ApacheBench, Version 2.3 <$Revision: 1554214 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/

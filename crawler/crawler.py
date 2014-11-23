@@ -384,4 +384,4 @@ if __name__ == "__main__":
 
     db_conn = lite.connect("dbFile.db")
     bot = crawler(db_conn, "urls.txt")
-    bot.crawl(depth=1)
+    bot.crawl(depth=2)
