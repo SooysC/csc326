@@ -6,11 +6,13 @@
 <h1>Ding</h1>
 <form name="searchForm" action="" method="get">
 	<input type="text" name="keywords"><br>
-	<input value="Search It" id="searchButton" type="submit" />   
+	<button type="submit" id="searchButton" value="">Search</button>
+	<!--input value="Search It" id="searchButton" type="submit" /-->   
 </form>
 %if user_email == '':
 	<form name="signInForm" method="get" action="">  
-		<input type="submit" name="signInButton" value="signIn"/>  
+		<!--input type="submit" name="signInButton" value="signIn"/-->
+		<!--button type="submit" id="signInButton" name="signInButton" value="signIn">Sign in</button-->
 	</form> 
 %else:
 	<h2> Hello {{user_email}} <h2>

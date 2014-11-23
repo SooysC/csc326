@@ -71,16 +71,22 @@ def redirect_page():
 					 )
 	return output
 	'''
+# GLOBAL
+sorted_url_list = []
+num_pages = 0
+page_num = 1
+url_per_page = 10
 @route('/', method = 'GET')
 def processQuery():
 	# get session
 	session = request.environ.get('beaker.session')
-
+	global sorted_url_list
+	global page_num
+	global num_pages
 	print 'processQuery'
 	keywords =  request.query_string
 	urlparams = request.query_string
 	print 'urlparams--->', urlparams
-
 	if urlparams == "":
 		# return the home page
 		print 'Gonna return the home page'
@@ -96,12 +102,11 @@ def processQuery():
 		# Index 0 is queryType, and Index 1 is queryParams
 		queryType = query[0]
 		queryParams = query[1]
-
+		print 'queryType--->', queryType
 		# http://localhost:8080/?signInButton=signIn
 		if queryType == "signInButton" and queryParams == "signIn":
 			# We need to sign in
 			print "Signin............"
-			# TODO Eventually we should return a tpl file with the proper layout, but forget that for now
 			flow = flow_from_clientsecrets('client_secrets.json', 
 											scope='https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email', 
 											redirect_uri='http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback')
@@ -115,14 +120,26 @@ def processQuery():
 			session.delete()
 			#bottle.redirect('https://accounts.google.com/logout')
 			bottle.redirect('/')
+		# Search queries go here
 		if queryType == "keywords":			
 			# We may need to do some search
 			currentKeywordList = queryParams.split('+')
 			# Split this one more time by ignoring all empty strings
 			currentKeywordList = [w for w in currentKeywordList if w != '']
-			print 'Current keywords:', currentKeywordList
-			
 
+			print 'Current keywords:', currentKeywordList
+			first_word = ''
+
+			if currentKeywordList:
+				first_word = currentKeywordList[0]
+			if first_word == '':
+				# return home page, not current
+				output = template('homepage', user_email = '')
+				return output 
+				
+			# reset page number and total number of result pages for every new search
+			page_num = 1
+			num_pages = 0
 			is_signed_in = 'user_email' in session
 			if is_signed_in:
 				user_email = session['user_email']
@@ -147,12 +164,28 @@ def processQuery():
 					search_history[user_email].append(word)
 
 				history = search_history[user_email][-10:]
+				print 'first_word:', first_word
+				sorted_url_list = crawler_db.get_sorted_urls(first_word)
+				print 'URL LIST:'
+				print sorted_url_list
 
+								
+				num_pages = len(sorted_url_list) / url_per_page
+				if len(sorted_url_list) % url_per_page != 0:
+					num_pages = num_pages + 1
+				'''
 				output = template( 'signed_in_results', 
 									wordList = current_user_results, #dict 
 									popularWords = history, #list
 									user_email = user_email
 								 )
+				'''
+				output = template(	'search_results', 
+									url_list = sorted_url_list,
+									page_num = page_num, 
+									list_size = len(sorted_url_list), 
+									num_pages = num_pages
+								)
 				return output
 			else:
 				##### not signed in, user_email should not be referenced
@@ -165,10 +198,61 @@ def processQuery():
 					else:
 						anon_results[word] = 1
 				# Need to display the current set of input keywords, and the count of those keywords
+				#output = template('anon_results', wordList = anon_results, user_email = '')
+				print 'first_word:', first_word
+				sorted_url_list = crawler_db.get_sorted_urls(first_word)
+				print 'URL LIST:'
+				print sorted_url_list
 
+				num_pages = len(sorted_url_list) / url_per_page
+				if len(sorted_url_list) % url_per_page != 0:
+					num_pages = num_pages + 1
 
-				output = template('anon_results', wordList = anon_results, user_email = '')
-				return output				
+				# At this point, return first ten results only
+				print 'page_num:', page_num
+				print 'num_pages:', num_pages
+
+				output = template(	'search_results', 
+									url_list = sorted_url_list[:url_per_page], 
+									page_num = page_num, 
+									list_size = len(sorted_url_list), 
+									num_pages = num_pages
+								)
+				return output
+		if queryType == "next":
+			print "Next....."
+			print 'queryParams', queryParams
+			page_num = page_num + 1
+			print 'page_num:', page_num
+			print 'num_pages:', num_pages
+			
+			if page_num <= num_pages:
+				output = template(	'search_results', 
+									url_list = sorted_url_list[(page_num - 1) * url_per_page : (page_num - 1) * url_per_page + url_per_page], 
+									page_num = page_num, 
+									list_size = len(sorted_url_list), 
+									num_pages = num_pages
+								)
+				return output
+		if queryType == "prev" and page_num > 0:
+			print "prev....."				
+			print 'queryParams', queryParams
+			page_num = page_num - 1
+			print 'page_num:', page_num
+			print 'num_pages:', num_pages
+
+			if page_num > 0:
+				output = template(	'search_results', 
+									url_list = sorted_url_list[(page_num - 1) * url_per_page : (page_num - 1) * url_per_page + url_per_page], 
+									page_num = page_num, 
+									list_size = len(sorted_url_list), 
+									num_pages = num_pages
+								)
+				return output
+		if queryType == "home":
+			output = template('homepage', user_email = '')
+			return output
+
 	else:
 		print 'In the else clause, nothing to do, just return home page'
 		try:
@@ -178,5 +262,5 @@ def processQuery():
 		output = template('homepage', user_email = email)
 		return output
 
-#run(app = app, host = 'localhost', port = 8080, debug = True)
-run(app = app, host='0.0.0.0', port = 80) # for AWS EC2
+run(app = app, host = 'localhost', port = 8080, debug = True)
+#run(app = app, host='0.0.0.0', port = 80) # for AWS EC2
