@@ -115,10 +115,10 @@ def processQuery():
 		if queryType == "signInButton" and queryParams == "signIn":
 			# We need to sign in
 			print "Signin............"
-			flow = flow_from_clientsecrets('client_secrets.json', 
-											scope='https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email', 
+			flow = flow_from_clientsecrets('client_secrets.json',
+											scope='https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email',
 											redirect_uri = 'http://localhost:8080/oauth2callback'
-											redirect_uri='http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback'
+											#redirect_uri='http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback'
 											)
 			uri = flow.step1_get_authorize_url() 
 			#print uri
