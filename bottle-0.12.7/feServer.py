@@ -19,7 +19,7 @@ TEMPLATE_PATH.insert(0,'./views/')
 sorted_url_list = []
 num_pages = 0
 page_num = 1
-url_per_page = 10
+urls_per_page = 10
 search_history = {}
 
 session_opts = {
@@ -105,15 +105,18 @@ def redirect_page():
 @route('/search', method = 'POST')
 def search():
     words = request.forms.get('words')
-    page_num = 1
-    url_per_page = 10
-    sorted_url_list = crawler_db.get_sorted_urls(words)
-    print len(sorted_url_list);
+    page_num = int(request.forms.get('page_num'))
+    print ""
+    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    print page_num
+    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    sorted_url_list = crawler_db.get_all_sorted_urls(words)
+
     if len(sorted_url_list) == 0:
         output = template( 'no_search_results', words = words)
     else:
         output = template( 'search_results',
-                url_list = sorted_url_list[(page_num - 1) * url_per_page : (page_num - 1) * url_per_page + url_per_page],
+                url_list = sorted_url_list[(page_num - 1) * urls_per_page : (page_num - 1) * urls_per_page + urls_per_page],
                 page_num = page_num,
                 list_size = len(sorted_url_list)
                 )
@@ -203,15 +206,15 @@ def processQuery():
                     search_history[user_email].append(word)
 
                 history = search_history[user_email][-10:]
-                sorted_url_list = crawler_db.get_sorted_urls(first_word)
+                sorted_url_list = crawler_db.get_all_sorted_urls(first_word)
 
 
-                num_pages = len(sorted_url_list) / url_per_page
-                if len(sorted_url_list) % url_per_page != 0:
+                num_pages = len(sorted_url_list) / urls_per_page
+                if len(sorted_url_list) % urls_per_page != 0:
                     num_pages = num_pages + 1
 
                 output = template( 'search_results',
-                        url_list = sorted_url_list[:url_per_page],
+                        url_list = sorted_url_list[:urls_per_page],
                         page_num = page_num,
                         list_size = len(sorted_url_list),
                         num_pages = num_pages,
@@ -229,16 +232,16 @@ def processQuery():
                         anon_results[word] = 1
                 # Need to display the current set of input keywords, and the count of those keywords
                 #output = template('anon_results', wordList = anon_results, user_email = '')
-                sorted_url_list = crawler_db.get_sorted_urls(first_word)
+                sorted_url_list = crawler_db.get_all_sorted_urls(first_word)
 
-                num_pages = len(sorted_url_list) / url_per_page
-                if len(sorted_url_list) % url_per_page != 0:
+                num_pages = len(sorted_url_list) / urls_per_page
+                if len(sorted_url_list) % urls_per_page != 0:
                     num_pages = num_pages + 1
 
                 # At this point, return first ten results only
 
                 output = template(	'search_results',
-                        url_list = sorted_url_list[:url_per_page],
+                        url_list = sorted_url_list[:urls_per_page],
                         page_num = page_num,
                         list_size = len(sorted_url_list),
                         num_pages = num_pages,
@@ -255,7 +258,7 @@ def processQuery():
 
             if page_num <= num_pages:
                 output = template(	'search_results',
-                        url_list = sorted_url_list[(page_num - 1) * url_per_page : (page_num - 1) * url_per_page + url_per_page],
+                        url_list = sorted_url_list[(page_num - 1) * urls_per_page : (page_num - 1) * urls_per_page + urls_per_page],
                         page_num = page_num,
                         list_size = len(sorted_url_list),
                         num_pages = num_pages,
@@ -272,7 +275,7 @@ def processQuery():
 
             if page_num > 0:
                 output = template( 'search_results',
-                        url_list = sorted_url_list[(page_num - 1) * url_per_page : (page_num - 1) * url_per_page + url_per_page],
+                        url_list = sorted_url_list[(page_num - 1) * urls_per_page : (page_num - 1) * urls_per_page + urls_per_page],
                         page_num = page_num,
                         list_size = len(sorted_url_list),
                         num_pages = num_pages,

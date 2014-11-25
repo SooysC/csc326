@@ -1,3 +1,7 @@
 .wrapper {
 	margin: 100px 200px 20px 200px;
 }
+
+#searchForm input{
+	width: 400px;
+}

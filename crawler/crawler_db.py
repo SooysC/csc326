@@ -20,7 +20,7 @@ def get_doc_urls_from_db(con, cur, doc_ids):
     sorted_doc_urls = sorted(doc_urls, key=lambda doc: doc[1], reverse=True)
     return [url[0] for url in sorted_doc_urls ]
 
-def get_sorted_urls(word, db_file="../crawler/dbFile.db"):
+def get_all_sorted_urls(word, db_file="../crawler/dbFile.db"):
     con, cur = connect_to_db(db_file)
 
     doc_ids = get_doc_ids_from_db(con, cur, word)
