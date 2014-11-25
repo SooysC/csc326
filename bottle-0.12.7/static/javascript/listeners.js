@@ -1,5 +1,13 @@
-// Implement all onclick listeners here
-function sendSearchQuery(){
-	var queryString = document.getElementById("keyword");
-	alert("hello" + queryString);
-} 
+
+$('#searchForm').submit(function(ev) {
+    ev.preventDefault(); // to stop the form from submitting
+    var words = $('#searchForm :input[name=words]').val()
+    search(words);
+});
+
+
+function search(words){
+  $.post( "/search", { words: words}, function( data ) {
+    $("#results").html(data);
+  }, "html");
+}

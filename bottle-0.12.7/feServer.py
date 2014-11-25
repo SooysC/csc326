@@ -1,6 +1,5 @@
 import bottle
-from bottle import error
-from bottle import route, run, get, post, request, template, debug, static_file, TEMPLATE_PATH, error
+from bottle import debug, error, get, post, request, response, route, run, static_file, template, TEMPLATE_PATH
 from oauth2client.client import OAuth2WebServerFlow, flow_from_clientsecrets
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
@@ -13,8 +12,14 @@ import sys
 sys.path.insert(0, '../crawler/')
 import crawler_db
 
-TEMPLATE_PATH.insert(0,'./')
+TEMPLATE_PATH.insert(0,'./views/')
 
+
+# GLOBAL
+sorted_url_list = []
+num_pages = 0
+page_num = 1
+url_per_page = 10
 search_history = {}
 
 session_opts = {
@@ -31,7 +36,8 @@ def error404(error):
     output = template('error_page')
     return output
 
-# Static Routes
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Routes
 @route('/<filename:re:.*\.js>')
 def javascripts(filename):
     return static_file(filename, root='static/javascript')
@@ -44,13 +50,15 @@ def stylesheets(filename):
 def stylesheets(filename):
     return static_file(filename, root='static/css')
 
-@route('/<filename:re:.*\.(jpg|png|gif|ico)>')
+@route('/<filename:re:.*\.(jpg|jpeg|png|gif|ico)>')
 def images(filename):
     return static_file(filename, root='static/image')
 
 @route('/<filename:re:.*\.(eot|ttf|woff|svg)>')
 def fonts(filename):
     return static_file(filename, root='static/fonts')
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 @route('/oauth2callback')
 def redirect_page():
@@ -93,11 +101,24 @@ def redirect_page():
                      )
     return output
     '''
-# GLOBAL
-sorted_url_list = []
-num_pages = 0
-page_num = 1
-url_per_page = 10
+
+@route('/search', method = 'POST')
+def search():
+    words = request.forms.get('words')
+    page_num = 1
+    url_per_page = 10
+    sorted_url_list = crawler_db.get_sorted_urls(words)
+    print len(sorted_url_list);
+    if len(sorted_url_list) == 0:
+        output = template( 'no_search_results', words = words)
+    else:
+        output = template( 'search_results',
+                url_list = sorted_url_list[(page_num - 1) * url_per_page : (page_num - 1) * url_per_page + url_per_page],
+                page_num = page_num,
+                list_size = len(sorted_url_list)
+                )
+    return output;
+
 @route('/', method = 'GET')
 def processQuery():
     # get session
@@ -105,13 +126,10 @@ def processQuery():
     global sorted_url_list
     global page_num
     global num_pages
-    print 'processQuery'
     keywords =  request.query_string
     urlparams = request.query_string
-    print 'urlparams--->', urlparams
     if urlparams == "":
         # return the home page
-        print 'Gonna return the home page'
         try:
             email = session['user_email']
         except:
@@ -124,23 +142,19 @@ def processQuery():
         # Index 0 is queryType, and Index 1 is queryParams
         queryType = query[0]
         queryParams = query[1]
-        print 'queryType--->', queryType
         # http://localhost:8080/?signInButton=signIn
         if queryType == "signInButton" and queryParams == "signIn":
             # We need to sign in
-            print "Signin............"
             flow = flow_from_clientsecrets('client_secrets.json',
                     scope='https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email',
-                    #redirect_uri = 'http://localhost:8080/oauth2callback'
+                    # redirect_uri = 'http://localhost:8080/oauth2callback'
                     redirect_uri='http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback'
                     )
             uri = flow.step1_get_authorize_url()
-            #print uri
             bottle.redirect(str(uri))
         # http://localhost:8080/?signOutButton=signOut
         if queryType == "signOutButton" and queryParams == "signOut":
             # We need to sign out
-            print 'signOut..........'
             session.delete()
             #bottle.redirect('https://accounts.google.com/logout')
             bottle.redirect('/')
@@ -151,7 +165,6 @@ def processQuery():
             # Split this one more time by ignoring all empty strings
             currentKeywordList = [w for w in currentKeywordList if w != '']
 
-            print 'Current keywords:', currentKeywordList
             first_word = ''
 
             if currentKeywordList:
@@ -174,9 +187,7 @@ def processQuery():
 
             if is_signed_in:
                 ##### user is signed in and user_email is the user's email
-                print 'User email is:', user_email
                 # signed up mode
-                print 'signed up mode...........'
                 current_user_results = {}
                 global search_history
                 for word in currentKeywordList:
@@ -192,26 +203,13 @@ def processQuery():
                     search_history[user_email].append(word)
 
                 history = search_history[user_email][-10:]
-                print 'first_word:', first_word
                 sorted_url_list = crawler_db.get_sorted_urls(first_word)
-                print 'URL LIST:'
-                print sorted_url_list
 
 
                 num_pages = len(sorted_url_list) / url_per_page
                 if len(sorted_url_list) % url_per_page != 0:
                     num_pages = num_pages + 1
 
-                print 'page_num:', page_num
-                print 'num_pages:', num_pages
-                #print 'user_email:', user_email
-                '''
-                output = template( 'signed_in_results',
-                                    wordList = current_user_results, #dict
-                                    popularWords = history, #list
-                                    user_email = user_email
-                                 )
-                '''
                 output = template( 'search_results',
                         url_list = sorted_url_list[:url_per_page],
                         page_num = page_num,
@@ -223,7 +221,6 @@ def processQuery():
             else:
                 ##### not signed in, user_email should not be referenced
                 # anon mode
-                print 'Anon mode........'
                 anon_results = {}
                 for word in currentKeywordList:
                     if word in anon_results:
@@ -232,18 +229,13 @@ def processQuery():
                         anon_results[word] = 1
                 # Need to display the current set of input keywords, and the count of those keywords
                 #output = template('anon_results', wordList = anon_results, user_email = '')
-                print 'first_word:', first_word
                 sorted_url_list = crawler_db.get_sorted_urls(first_word)
-                print 'URL LIST:'
-                print sorted_url_list
 
                 num_pages = len(sorted_url_list) / url_per_page
                 if len(sorted_url_list) % url_per_page != 0:
                     num_pages = num_pages + 1
 
                 # At this point, return first ten results only
-                print 'page_num:', page_num
-                print 'num_pages:', num_pages
 
                 output = template(	'search_results',
                         url_list = sorted_url_list[:url_per_page],
@@ -254,11 +246,7 @@ def processQuery():
                         )
                 return output
         if queryType == "next":
-            print "Next....."
-            print 'queryParams', queryParams
             page_num = page_num + 1
-            print 'page_num:', page_num
-            print 'num_pages:', num_pages
 
             try:
                 email = session['user_email']
@@ -275,11 +263,7 @@ def processQuery():
                         )
                 return output
         if queryType == "prev" and page_num > 0:
-            print "prev....."
-            print 'queryParams', queryParams
             page_num = page_num - 1
-            print 'page_num:', page_num
-            print 'num_pages:', num_pages
 
             try:
                 email = session['user_email']
@@ -304,7 +288,6 @@ def processQuery():
             return output
 
     else:
-        print 'In the else clause, nothing to do, just return home page'
         try:
             email = session['user_email']
         except:
