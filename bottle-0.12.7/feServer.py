@@ -1,5 +1,6 @@
 import bottle
-from bottle import route, run, get, post, request, template, debug, static_file, TEMPLATE_PATH
+from bottle import error
+from bottle import route, run, get, post, request, template, debug, static_file, TEMPLATE_PATH, error
 from oauth2client.client import OAuth2WebServerFlow, flow_from_clientsecrets
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
@@ -8,17 +9,9 @@ import operator
 import httplib2
 from beaker.middleware import SessionMiddleware
 
-# crawler db
 import sys
-
 sys.path.insert(0, '../crawler/')
 import crawler_db
-
-###################################### For Samprit:
-# to get an array of urls, use:
-# crawler_db.get_sorted_urls("word")
-######################################
-
 
 TEMPLATE_PATH.insert(0,'./')
 
@@ -32,11 +25,32 @@ session_opts = {
         }
 app = SessionMiddleware(bottle.app(), session_opts)
 
-from bottle import error
+
 @error(404)
 def error404(error):
-    output - template('error_page')
+    output = template('error_page')
     return output
+
+# Static Routes
+@route('/<filename:re:.*\.js>')
+def javascripts(filename):
+    return static_file(filename, root='static/javascript')
+
+@route('/<filename:re:.*\.css>')
+def stylesheets(filename):
+    return static_file(filename, root='static/css')
+
+@route('/<filename:re:.*\.css.map>')
+def stylesheets(filename):
+    return static_file(filename, root='static/css')
+
+@route('/<filename:re:.*\.(jpg|png|gif|ico)>')
+def images(filename):
+    return static_file(filename, root='static/image')
+
+@route('/<filename:re:.*\.(eot|ttf|woff|svg)>')
+def fonts(filename):
+    return static_file(filename, root='static/fonts')
 
 @route('/oauth2callback')
 def redirect_page():

@@ -4,7 +4,7 @@
 <body>
 
 <img src="http://img.wikinut.com/img/1mpdglbma_q7fudr/jpeg/724x5000/Ding.jpeg" alt="Ding" style="width:200px;height:100px">
-<h1>Ding</h1>
+<h1>Ding (Anon)</h1>
 <form name="searchForm" action="" method="get">
 	<input type="text" name="keywords"><br>
 	<input value="Search It" id="searchButton" type="submit" />
