@@ -5,3 +5,8 @@
 #searchForm input{
 	width: 400px;
 }
+
+.user-email{
+  color: #FFF;
+  margin: 0px 20px;
+}

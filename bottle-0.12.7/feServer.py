@@ -93,6 +93,13 @@ def signIn():
    bottle.redirect(str(uri))
 
 
+@route('/signout', method = 'GET')
+def signOut():
+   session = request.environ.get('beaker.session')
+   session.delete()
+   bottle.redirect('/')
+
+
 @route('/', method = 'GET')
 def processQuery():
     # get session
