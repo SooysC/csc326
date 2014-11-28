@@ -25,4 +25,3 @@ csc326
 ### brought to you by team 25 of CSC326:
 1. Samprit Raihan (raihansa)
 1. Jon Erik Suero (suerojon)
-  

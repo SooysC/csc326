@@ -106,10 +106,7 @@ def redirect_page():
 def search():
     words = request.forms.get('words')
     page_num = int(request.forms.get('page_num'))
-    print ""
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print page_num
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
     sorted_url_list = crawler_db.get_all_sorted_urls(words)
 
     if len(sorted_url_list) == 0:
