@@ -4,8 +4,8 @@
 
     <div class="panel-heading">
       <h3 class="panel-title">
-        <a href="{{url}}" target="_blank">
-          {{url}}
+        <a class="url-link" href="{{url}}" target="_blank">
+          {{url[:65] + (url[65:] and '..')}}
         </a>
       </h3>
     </div>

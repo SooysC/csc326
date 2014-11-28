@@ -1,12 +1,42 @@
+html,body {
+  height:100%;
+}
+
 .wrapper {
-	margin: 100px 200px 20px 200px;
+  height: 100%;
+  padding: 100px 100px 50px 100px;
 }
 
 #searchForm input{
-	width: 400px;
+  width: 400px;
 }
 
 .user-email{
   color: #FFF;
   margin: 0px 20px;
+}
+
+#preview-box{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: none;
+}
+
+#preview-box iframe{
+  width: 100%;
+  height: 100%;
+}
+
+.left-column {
+  width: 45%;
+  height: 100%;
+  float: left;
+  overflow: scroll;
+}
+
+.right-column {
+  width: 50%;
+  height: 100%;
+  float: right;
 }

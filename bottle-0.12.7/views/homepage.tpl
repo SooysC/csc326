@@ -2,9 +2,13 @@
 
   <div class = "wrapper">
     <p hidden id="curent_words"></p>
-    <p hidden id="last_page_num"></p>
-    <div id="results">
-    	^ Start Searching 
+    <div id="results" class="left-column">
+      ^ Start Searching
+    </div>
+    <div class="right-column">
+      <div id="preview-box">
+        <iframe src=""></iframe>
+      </div>
     </div>
   </div>
 
