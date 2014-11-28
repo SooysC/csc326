@@ -35,13 +35,13 @@
         </form>
 
         %if user_email == '':
-          <form name="signInForm" class="navbar-form navbar-right" method="get" action="">
+          <form name="signInForm" class="navbar-form navbar-right" method="get" action="signin">
             <!--input type="submit" name="signInButton" value="signIn"/-->
             <button type="submit" id="signInButton" class="btn btn-warning" name="signInButton" value="signIn">Sign In (Not Working)</button>
           </form>
         %else:
           <h2> Hello {{user_email}} <h2>
-          <form name="signOutForm" method="get" action="">
+          <form name="signOutForm" method="get" action="kabooga">
             <button type="submit" id="signOutButton" name="signOutButton" value="signOut">Sign Out</button>
           </form>
         %end

@@ -1,19 +1,21 @@
 import bottle
 from bottle import debug, error, get, post, request, response, route, run, static_file, template, TEMPLATE_PATH
+
 from oauth2client.client import OAuth2WebServerFlow, flow_from_clientsecrets
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
+
 import json
 import operator
-import httplib2
 from beaker.middleware import SessionMiddleware
-
 import sys
 sys.path.insert(0, '../crawler/')
+sys.path.insert(0, './lib/')
 import crawler_db
+import env_server
+import google_authenticator
 
 TEMPLATE_PATH.insert(0,'./views/')
-
 
 # GLOBAL
 sorted_url_list = []
@@ -62,51 +64,16 @@ def fonts(filename):
 
 @route('/oauth2callback')
 def redirect_page():
-    code = request.query.get('code', '')
-    with open("client_secrets.json") as json_file:
-        client_secrets = json.load(json_file)
-        CLIENT_ID = client_secrets["web"]["client_id"]
-        CLIENT_SECRET = client_secrets["web"]["client_secret"]
-        SCOPE = client_secrets["web"]["auth_uri"]
-        REDIRECT_URI = client_secrets["web"]["redirect_uris"]
-
-    flow = OAuth2WebServerFlow(client_id = CLIENT_ID,
-            client_secret = CLIENT_SECRET,
-            scope = 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email',
-            #redirect_uri = 'http://localhost:8080/oauth2callback'
-            redirect_uri = 'http://ec2-54-173-22-59.compute-1.amazonaws.com/oauth2callback'
-            )
-
-
-    credentials = flow.step2_exchange(code)
-    token = credentials.id_token['sub']
-    http = httplib2.Http()
-    http = credentials.authorize(http)
-    # Get user email
-    users_service = build('oauth2', 'v2', http = http)
-    user_document = users_service.userinfo().get().execute()
-    user_email = user_document['email']
-
-    # Create a beaker session
-    s = request.environ.get('beaker.session')
-    s['user_email'] = user_email
+    s = request.environ.get('beaker.session') # Create a beaker session
+    s['user_email'] = google_authenticator.get_user_email(request)
     s.save()
-    bottle.redirect('/')
-    # Just serve the signed_in_results page
-    '''
-    output = template( 'signed_in_results',
-                        wordList = None, #dict
-                        popularWords = None, #list
-                        user_email = user_email
-                     )
-    return output
-    '''
+    bottle.redirect('/') # fix this - Erik
+
 
 @route('/search', method = 'POST')
 def search():
     words = request.forms.get('words')
     page_num = int(request.forms.get('page_num'))
-
     sorted_url_list = crawler_db.get_all_sorted_urls(words)
 
     if len(sorted_url_list) == 0:
@@ -118,6 +85,13 @@ def search():
                 list_size = len(sorted_url_list)
                 )
     return output;
+
+
+@route('/signin', method = 'GET')
+def signIn():
+   uri = google_authenticator.get_uri()
+   bottle.redirect(str(uri))
+
 
 @route('/', method = 'GET')
 def processQuery():
@@ -295,5 +269,8 @@ def processQuery():
         output = template('homepage', user_email = email)
         return output
 
-run(app = app, host = 'localhost', port = 8080, debug = True)
-#run(app = app, host='0.0.0.0', port = 80) # for AWS EC2
+if (env_server.is_aws()):
+    run(app = app, host='0.0.0.0', port = 80) # for AWS EC2
+else:
+    run(app = app, host = 'localhost', port = 8080, debug = True)
+
