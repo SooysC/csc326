@@ -35,9 +35,7 @@ $("#results").on({
 
 
 $("#wrapper").on("click", "#recommended-words-btn", function() {
-  console.log("search!!");
   var words = $(this).html();
-  console.log(words);
   $('#searchForm :input[name=words]').val(words);
   triggerNewSearch(words);
 });
