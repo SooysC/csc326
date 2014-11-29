@@ -12,11 +12,7 @@ import google_authenticator
 TEMPLATE_PATH.insert(0,'./views/')
 
 # GLOBAL
-sorted_url_list = []
-num_pages = 0
-page_num = 1
-urls_per_page = 10
-search_history = {}
+URLS_PER_PAGE = 10
 
 session_opts = {
         'session.type': 'file',
@@ -68,15 +64,16 @@ def redirect_page():
 def search():
     words = request.forms.get('words')
     page_num = int(request.forms.get('page_num'))
-    sorted_url_list = crawler_db.get_all_sorted_urls(words)
+    recommended_words, sorted_url_list = crawler_db.get_all_sorted_urls(words)
 
     if len(sorted_url_list) == 0:
-        output = template( 'no_search_results', words = words)
+        output = template( 'no_search_results', words = words, recommended_words = recommended_words)
     else:
         output = template( 'search_results',
-                url_list = sorted_url_list[(page_num - 1) * urls_per_page : (page_num - 1) * urls_per_page + urls_per_page],
+                url_list = sorted_url_list[(page_num - 1) * URLS_PER_PAGE : (page_num - 1) * URLS_PER_PAGE + URLS_PER_PAGE],
                 page_num = page_num,
-                list_size = len(sorted_url_list)
+                list_size = len(sorted_url_list),
+                recommended_words = recommended_words
                 )
     return output;
 

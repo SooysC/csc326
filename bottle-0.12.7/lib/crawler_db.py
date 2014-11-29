@@ -1,10 +1,16 @@
 import sqlite3 as lite
-import words_dissector
+import words_analyzer
+
 
 def connect_to_db(db_file = "../crawler/dbFile.db"):
     con = lite.connect(db_file)
     cur = con.cursor()
     return con, cur
+
+
+def get_all_words(con, cur, char):
+    cur.execute("SELECT word FROM Lexicon WHERE word LIKE '%c%%\'" % char)
+    return [w[0] for w in cur.fetchall()]
 
 
 def get_doc_ids_from_db(con, cur, word):
@@ -25,13 +31,22 @@ def get_doc_urls_from_db(con, cur, doc_ids):
 
 
 def get_all_sorted_urls(words, db_file="../crawler/dbFile.db"):
-    con, cur = connect_to_db(db_file)
+    con, cur = connect_to_db(db_file) # change to decorator later - Erik
 
-    words_generator = words_dissector.split(words)
+    words_generator = words_analyzer.split(words)
     doc_ids = []
+    recommended_words = []
 
     for word in words_generator:
-        doc_ids += get_doc_ids_from_db(con, cur, word)
-        doc_ids = list(set(doc_ids)) # remove duplicates
+        new_doc_ids = get_doc_ids_from_db(con, cur, word)
+        if new_doc_ids == []:
+            all_available_words = get_all_words(con,cur, word[0])
+            recommended_words.append( words_analyzer.recommend(word, all_available_words) )
+        else:
+            recommended_words.append( word )
+            doc_ids = list(set(doc_ids + new_doc_ids)) # remove duplicates
 
-    return (doc_ids==[] and []) or get_doc_urls_from_db(con, cur, ','.join(doc_ids))
+    recommended_words = ' '.join(recommended_words)
+    recommended_words = "" if recommended_words==words else recommended_words
+
+    return (doc_ids==[] and (recommended_words, [])) or (recommended_words, get_doc_urls_from_db(con, cur, ','.join(doc_ids)))

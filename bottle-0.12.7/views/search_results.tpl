@@ -1,3 +1,4 @@
+<div hidden id="recommended-words">{{recommended_words}}</div>
 
 %for index, url in enumerate(url_list):
   <div class="panel panel-info">

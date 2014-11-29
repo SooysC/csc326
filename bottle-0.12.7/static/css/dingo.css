@@ -2,7 +2,7 @@ html,body {
   height:100%;
 }
 
-.wrapper {
+#wrapper {
   height: 100%;
   padding: 100px 100px 50px 100px;
 }
