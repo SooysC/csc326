@@ -4,7 +4,6 @@ import json
 import operator
 from beaker.middleware import SessionMiddleware
 import sys
-sys.path.insert(0, '../crawler/')
 sys.path.insert(0, './lib/')
 import crawler_db
 import env_server
