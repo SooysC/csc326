@@ -22,6 +22,7 @@ def deploy():
     print "Crawler Finished" # change to decorator, print func.__name__
 
     # aws setup
+    print "Please wait while we are creating the instance"
     public_ip, instance_id, key_pair_path = aws_setup.setup()
     print "AWS Setup Finished"
 
@@ -32,8 +33,10 @@ def deploy():
 
     print "App Launched"
 
+    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     print "Public IP Address: %s" % public_ip
     print "Instance ID: %s" % instance_id
+    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     return public_ip
 

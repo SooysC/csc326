@@ -1,6 +1,6 @@
 import boto.ec2
+import os
 import time
-
 
 AWS_ACCESS_KEY_ID = 'AKIAIDEMXREVBLQBP6ZA'
 AWS_SECRET_ACCESS_KEY = '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'
@@ -11,10 +11,16 @@ SECURITY_GROUP_DESC = 'security group 25 for csc326'
 AMI = 'ami-8caa1ce4'
 
 
+
+def connect_to_aws():
+    return boto.ec2.connect_to_region("us-east-1", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+
+
 def aws_init():
-    conn = boto.ec2.connect_to_region("us-east-1", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+    conn = connect_to_aws()
 
     kp = conn.create_key_pair(KEY_NAME)
+    os.system("rm -f %s" % PEM_PATH+KEY_NAME+'.pem')
     kp.save(PEM_PATH)
 
     sg = conn.create_security_group(SECURITY_GROUP_NAME, SECURITY_GROUP_DESC)
