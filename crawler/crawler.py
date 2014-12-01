@@ -28,6 +28,8 @@ import re
 import sqlite3 as lite
 from pagerank import page_rank
 
+"""Global dictionary that holds the {url: url_title}"""
+url_title_dict = {}
 
 def attr(elem, attr):
     """An html attribute from an html element. E.g. <a href="">, then
@@ -61,7 +63,8 @@ class crawler(object):
         self._inverted_index_cache = { } 
         self._resolved_inverted_index_cache = { }
         self._links_cache = [ ]
-
+        # new 
+        self._title_cache = [ ]
         # functions to call when entering and exiting specific tags
         self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
         self._exit = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -133,22 +136,33 @@ class crawler(object):
         self._db_cursor.execute('CREATE TABLE IF NOT EXISTS Lexicon(word_id INTEGER PRIMARY KEY, word TEXT NOT NULL UNIQUE);')
         self._db_cursor.execute('CREATE TABLE IF NOT EXISTS InvertedIndex(word_id INTEGER NOT NULL UNIQUE, doc_ids TEXT NOT NULL);')
         self._db_cursor.execute('CREATE TABLE IF NOT EXISTS PageRank(doc_id INTEGER NOT NULL UNIQUE, doc_rank FLOAT);')
-        self._db_cursor.execute('CREATE TABLE IF NOT EXISTS DocIndex(doc_id INTEGER PRIMARY KEY, doc_url TEXT UNIQUE);')
+        self._db_cursor.execute('CREATE TABLE IF NOT EXISTS DocIndex(doc_id INTEGER PRIMARY KEY, doc_url TEXT UNIQUE, doc_url_title TEXT);')
 
-    def insert_document_to_db(self, url): # Erik
+    def insert_document_to_db(self, url): # Erik Samprit
         """A function that inserts a url into a document db table
         and then returns that newly inserted document's id."""
-        self._db_cursor.execute('INSERT INTO DocIndex(doc_url) VALUES("%s");' %  url)
+
+        doc_url_title = ''
+
+        global url_title_dict
+        
+        if url in url_title_dict:
+            doc_url_title = url_title_dict[url]
+            print "Current doc_url_title = ", doc_url_title
+        
+        self._db_cursor.execute('INSERT INTO DocIndex(doc_url, doc_url_title) VALUES("%s", "%s");' % (url, doc_url_title))
         self._db_cursor.execute('SELECT doc_id FROM DocIndex WHERE doc_url = "%s"' % url)
+        
         doc_id = self._db_cursor.fetchone()[0]
         assert(doc_id > 0)
         return doc_id
-    
+
     def insert_word_to_db(self, word): # Erik
         """A function that inserts a word into the lexicon db table
         and then returns that newly inserted word's id."""
         self._db_cursor.execute('INSERT INTO Lexicon(word) VALUES("%s");' %  word)
         self._db_cursor.execute('SELECT word_id FROM Lexicon WHERE word = "%s"' % word)
+         
         word_id = self._db_cursor.fetchone()[0]
         assert(word_id > 0)
         return word_id
@@ -163,9 +177,9 @@ class crawler(object):
     def insert_inververted_index_to_db(self):
         """ Insert rankings of pages/documents to database"""
         for word_id, doc_ids in self._inverted_index_cache.iteritems():
-            self._db_cursor.execute('INSERT INTO InvertedIndex(word_id, doc_ids) VALUES (%d, "%s");' % (word_id, ','.join(str(x) for x in doc_ids)) )
-
-
+			print 'word_id = ', word_id, '| doc_ids = ', doc_ids
+			self._db_cursor.execute('INSERT INTO InvertedIndex(word_id, doc_ids) VALUES (%d, "%s");' % (word_id, ','.join(str(x) for x in doc_ids)) )
+  
     def word_id(self, word):
         """Get the word id of some specific word."""
         if word in self._word_id_cache:
@@ -181,9 +195,10 @@ class crawler(object):
             return self._doc_id_cache[url]
         
         doc_id = self.insert_document_to_db(url)
+
         self._doc_id_cache[url] = doc_id
         return doc_id
-    
+
     def _fix_url(self, curr_url, rel):
         """Given a url and either something relative to that url or another url,
         get a properly parsed url."""
@@ -196,6 +211,10 @@ class crawler(object):
         curr_url = urlparse.urldefrag(curr_url)[0]
         parsed_url = urlparse.urlparse(curr_url)
         return urlparse.urljoin(parsed_url.geturl(), rel)
+    
+    def add_url_title(self, from_doc_id, to_doc_id):
+    	"""Add a url_title into the database."""
+    	self._title_cache.append( (from_doc_id, to_doc_id) )
 
     def add_link(self, from_doc_id, to_doc_id):
         """Add a link into the database, or increase the number of links between
@@ -211,19 +230,25 @@ class crawler(object):
     
     def _visit_a(self, elem):
         """Called when visiting <a> tags."""
-
         dest_url = self._fix_url(self._curr_url, attr(elem,"href"))
+
+        # add to global dictionary of url and url_title
+        global url_title_dict
+        url_title = self._text_of(elem).strip()
+        url_title_dict[dest_url] = url_title 
 
         self._url_queue.append((dest_url, self._curr_depth)) # add the just found URL to the url queue
         
         self.add_link(self._curr_doc_id, self.document_id(dest_url)) # add a link entry into the database from the current document to the other document
 
         # TODO add title/alt/text to index for destination url
-    
-        #print "href="+repr(dest_url), \
-        #      "title="+repr(attr(elem,"title")), \
-        #      "alt="+repr(attr(elem,"alt")), \
-        #      "text="+repr(self._text_of(elem))
+		# visit title here
+        
+        print	 "href="+repr(dest_url), \
+              	 "document title="+ repr(url_title) \
+
+              #"alt="+repr(attr(elem,"alt")), \
+              #"text="+repr(self._text_of(elem))
 
     def _add_words_to_document(self):
         # TODO: knowing self._curr_doc_id and the list of all words and their
@@ -374,6 +399,10 @@ class crawler(object):
     def get_links(self):
         """Get the links between pages for PageRank"""
         return self._links_cache
+    # new
+	def get_url_title(self):
+		"""Get the title between pages for PageRank"""
+        return self._title_cache
 
 if __name__ == "__main__":
     # remove db file first

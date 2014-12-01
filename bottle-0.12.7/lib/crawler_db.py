@@ -9,7 +9,9 @@ def connect_to_db(db_file = "../crawler/dbFile.db"):
 
 
 def get_all_words(con, cur, char):
+
     cur.execute("SELECT word FROM Lexicon WHERE word LIKE '%c%%\'" % char)
+    #cur.execute("SELECT word FROM Lexicon")
     return [w[0] for w in cur.fetchall()]
 
 
@@ -22,7 +24,7 @@ def get_doc_ids_from_db(con, cur, word):
         doc_ids = []
     return doc_ids
 
-
+# Deprecated, but keep it for now
 def get_doc_urls_from_db(con, cur, doc_ids):
     cur.execute('SELECT DocIndex.doc_url, PageRank.doc_rank FROM DocIndex LEFT JOIN PageRank ON DocIndex.doc_id = PageRank.doc_id WHERE DocIndex.doc_id IN (%s)' % doc_ids)
     doc_urls = cur.fetchall()
@@ -49,4 +51,11 @@ def get_all_sorted_urls(words, db_file="../crawler/dbFile.db"):
     recommended_words = ' '.join(recommended_words)
     recommended_words = "" if recommended_words==words else recommended_words
 
-    return (doc_ids==[] and (recommended_words, [])) or (recommended_words, get_doc_urls_from_db(con, cur, ','.join(doc_ids)))
+    return (doc_ids==[] and (recommended_words, [])) or (recommended_words, get_doc_urls_and_title_from_db(con, cur, ','.join(doc_ids)))
+
+
+def get_doc_urls_and_title_from_db(con, cur, doc_ids):
+    cur.execute('SELECT DocIndex.doc_url, PageRank.doc_rank, DocIndex.doc_url_title FROM DocIndex LEFT JOIN PageRank ON DocIndex.doc_id = PageRank.doc_id WHERE DocIndex.doc_id IN (%s)' % doc_ids)
+    doc_urls = cur.fetchall()
+    sorted_doc_urls = sorted(doc_urls, key=lambda doc: doc[1], reverse=True)
+    return [(url[0], url[2]) for url in sorted_doc_urls ]

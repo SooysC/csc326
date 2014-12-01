@@ -1,12 +1,12 @@
 <div hidden id="recommended-words">{{recommended_words}}</div>
-
-%for index, url in enumerate(url_list):
+          
+%for index, (url, title) in enumerate(url_list):
   <div class="panel panel-info">
 
     <div class="panel-heading">
       <h3 class="panel-title">
         <a class="url-link" href="{{url}}" target="_blank">
-          {{url[:65] + (url[65:] and '..')}}
+          {{title}}
         </a>
       </h3>
     </div>
