@@ -12,6 +12,14 @@
     </div>
     <div class="panel-body">
       body..
+      
+      %if user_email != '':      
+      <form id="pinForm" class="navbar-form navbar-left" method="post" action="pinurl">
+        <input type="hidden" name="pinurl" class="form-control" value="{{url}}">
+        <button type="submit" id="pinButton" class="btn btn-warning" >Pin it!</button>
+      </form>
+      %end
+      
     </div>
   </div>
 %end
