@@ -51,6 +51,7 @@ def get_all_sorted_urls(words, db_file="../crawler/dbFile.db"):
     recommended_words = ' '.join(recommended_words)
     recommended_words = "" if recommended_words==words else recommended_words
 
+    con.close()
     return (doc_ids==[] and (recommended_words, [])) or (recommended_words, get_doc_urls_and_title_from_db(con, cur, ','.join(doc_ids)))
 
 
@@ -62,18 +63,24 @@ def get_doc_urls_and_title_from_db(con, cur, doc_ids):
 
 
 def insert_pin_urls_to_db(email, url, db_file="../crawler/dbFile.db"):
-    
     con, cur = connect_to_db(db_file)
+
     # Getting the url titles from DocIndex
-    cur.execute('SELECT DocIndex.doc_url_title FROM DocIndex WHERE DocIndex.doc_url IN (%s)' % url)
-    doc_url_title = cur.fetchall()
-    print "doc_url_title:", doc_url_title
+    query = 'SELECT doc_url_title FROM DocIndex WHERE doc_url IN ("%s")' % url
+    cur.execute(query)
+    doc_url_title = cur.fetchone()[0]
+
     # Inserting email, url and url titles into PinTable
-    cur.execute('INSERT INTO PinTable VALUES ("%s", "%s", "%s")' % (email, url, doc_url_title))
+    query = 'INSERT INTO PinBoard (email, doc_url, doc_url_title) VALUES ("%s", "%s", "%s")' % (email, url, doc_url_title)
+    cur.execute(query)
+
     # Testing to see if it actually adds a lot of items to the table
-    cur.execute('SELECT * FROM PinTable')
+    cur.execute('SELECT * FROM PinBoard')
     results = cur.fetchall()
-    print 'PinTable:'
+    print 'PinBoard:'
     print '-' * 20
     print results
     print '-' * 20
+    con.commit()
+    con.close()
+
