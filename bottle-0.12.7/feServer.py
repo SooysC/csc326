@@ -62,6 +62,13 @@ def redirect_page():
 
 @route('/search', method = 'POST')
 def search():
+    session = request.environ.get('beaker.session')
+
+    try:
+        email = session['user_email']
+    except:
+        email = ''
+
     words = request.forms.get('words')
     page_num = int(request.forms.get('page_num'))
     recommended_words, sorted_url_list = crawler_db.get_all_sorted_urls(words)
@@ -72,10 +79,24 @@ def search():
                 url_list = sorted_url_list[(page_num - 1) * URLS_PER_PAGE : (page_num - 1) * URLS_PER_PAGE + URLS_PER_PAGE],
                 page_num = page_num,
                 list_size = len(sorted_url_list),
-                recommended_words = recommended_words
+                recommended_words = recommended_words,
+                user_email = email
                 )
     return output;
 
+
+@route('/pinurl', method = 'POST')
+def search():
+    session = request.environ.get('beaker.session')
+    try:
+        email = session['user_email']
+    except:
+        email = ''
+    pinurl = request.forms.get('pinButton')
+    print pinurl
+    crawler_db.insert_pin_urls_to_db(email, pinurl)
+    # temporarily returning the pinned url only, will change it later
+    return pinurl
 
 @route('/signin', method = 'GET')
 def signIn():

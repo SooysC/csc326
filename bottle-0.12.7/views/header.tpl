@@ -38,6 +38,10 @@
             <button type="submit" id="signInButton" class="btn btn-warning">Sign In</button>
           </form>
         %else:
+          <form name="pinBoard" class="navbar-form navbar-left" method="get" action="pinurl">
+            <button type="submit" id="pinBoardButton" class="btn btn-warning">My Pinboard</button>
+          </form>
+          
           <form name="signInForm" class="navbar-form navbar-right" method="get" action="signout">
             <div class="form-group user-email">{{user_email}}</div>
             <button type="submit" id="signInButton" class="btn btn-warning">Sign Out</button>

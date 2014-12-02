@@ -59,3 +59,21 @@ def get_doc_urls_and_title_from_db(con, cur, doc_ids):
     doc_urls = cur.fetchall()
     sorted_doc_urls = sorted(doc_urls, key=lambda doc: doc[1], reverse=True)
     return [(url[0], url[2]) for url in sorted_doc_urls ]
+
+
+def insert_pin_urls_to_db(email, url, db_file="../crawler/dbFile.db"):
+    
+    con, cur = connect_to_db(db_file)
+    # Getting the url titles from DocIndex
+    cur.execute('SELECT DocIndex.doc_url_title FROM DocIndex WHERE DocIndex.doc_url IN (%s)' % url)
+    doc_url_title = cur.fetchall()
+    print "doc_url_title:", doc_url_title
+    # Inserting email, url and url titles into PinTable
+    cur.execute('INSERT INTO PinTable VALUES ("%s", "%s", "%s")' % (email, url, doc_url_title))
+    # Testing to see if it actually adds a lot of items to the table
+    cur.execute('SELECT * FROM PinTable')
+    results = cur.fetchall()
+    print 'PinTable:'
+    print '-' * 20
+    print results
+    print '-' * 20
