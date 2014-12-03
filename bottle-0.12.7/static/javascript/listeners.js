@@ -8,6 +8,17 @@ $('#searchForm').submit(function(ev) {
   triggerNewSearch(words);
 });
 
+$('#pinForm').submit(function(ev) {
+  ev.preventDefault(); // to stop the form from submitting
+  var pinurl = $('#searchForm :button[name=pinButton]').val();
+  triggerNewPin(pinurl);
+});
+
+function triggerNewPin(pinurl){
+  $.post("/pinurl", { pin_url: pinurl}, function(data){
+    cb(data);
+  }, "html");
+}
 
 $(window).scroll(function() {
   if($(window).scrollTop() + $(window).height() == $(document).height()) {
@@ -40,7 +51,6 @@ $("#wrapper").on("click", "#recommended-words-btn", function() {
   triggerNewSearch(words);
 });
 
-
 function triggerNewSearch(words){
   $('#curent_words').val(words);
   last_page_num = 1; // after a fresh search, set page number to 1
@@ -67,3 +77,4 @@ function setupRecommendedWords(){
     $('#recommended-words-box').show();
   }
 }
+

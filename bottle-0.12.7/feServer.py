@@ -63,7 +63,6 @@ def redirect_page():
 @route('/search', method = 'POST')
 def search():
     session = request.environ.get('beaker.session')
-
     try:
         email = session['user_email']
     except:
@@ -84,19 +83,38 @@ def search():
                 )
     return output;
 
-
-@route('/pinurl', method = 'POST')
-def search():
+@route('/pinboard', method = 'POST')
+def displayPinBoard():
     session = request.environ.get('beaker.session')
     try:
         email = session['user_email']
     except:
         email = ''
-    pinurl = request.forms.get('pinButton')
+    pins =  crawler_db.get_pin_urls_from_db(email)
+    if len(pins) == 0:
+        return "You havent pinned anything yet"
+    else:
+        print pins
+        output = template( 'pinboard',
+                pins = pins,
+                user_email = email
+                )
+        return "Relax! We are getting pins"
+
+@route('/pinurl', method = 'POST')
+def pinurl():
+    session = request.environ.get('beaker.session')
+    try:
+        email = session['user_email']
+    except:
+        email = ''
+    pinurl = request.forms.get('pin_url')
     print pinurl
     crawler_db.insert_pin_urls_to_db(email, pinurl)
-    # temporarily returning the pinned url only, will change it later
-    return pinurl
+    
+    # This is basically the body div with the Pin It button hidden
+    output = template( 'pin_response')
+    return output
 
 @route('/signin', method = 'GET')
 def signIn():

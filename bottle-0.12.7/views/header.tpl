@@ -38,7 +38,7 @@
             <button type="submit" id="signInButton" class="btn btn-warning">Sign In</button>
           </form>
         %else:
-          <form name="pinBoard" class="navbar-form navbar-left" method="get" action="pinurl">
+          <form name="pinBoard" class="navbar-form navbar-left" method="post" action="pinboard">
             <button type="submit" id="pinBoardButton" class="btn btn-warning">My Pinboard</button>
           </form>
           
