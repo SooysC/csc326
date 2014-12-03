@@ -8,6 +8,25 @@ $('#searchForm').submit(function(ev) {
   triggerNewSearch(words);
 });
 
+$('#wrapper').on("click", ".pin-btn", function(ev) {
+  ev.preventDefault(); // to stop the form from submitting
+  var pinurl = $(this).attr('value');
+  console.log('pinurl: '+pinurl);
+  triggerNewPin(pinurl);
+});
+
+function triggerNewPin(pinurl){
+  $.post("/pinurl", {pinurl: pinurl}, function(data){
+    console.log("HELLO!!");
+    console.log(data);
+    if(data.statusCode == "false"){
+      console.log('false');
+      $('#pinForm').hide();
+    }
+    else
+      alert('Try Pinning again');
+  }, "json");
+}
 
 $(window).scroll(function() {
   if($(window).scrollTop() + $(window).height() == $(document).height()) {
@@ -40,7 +59,6 @@ $("#wrapper").on("click", "#recommended-words-btn", function() {
   triggerNewSearch(words);
 });
 
-
 function triggerNewSearch(words){
   $('#curent_words').val(words);
   last_page_num = 1; // after a fresh search, set page number to 1
@@ -52,7 +70,7 @@ function triggerNewSearch(words){
 
 
 function search(words, page_num, cb){
-  $.post( "/search", { words: words, page_num: page_num}, function(data){
+  $.post( "/search", {words: words, page_num: page_num}, function(data){
     cb(data);
   }, "html");
 }
@@ -67,3 +85,4 @@ function setupRecommendedWords(){
     $('#recommended-words-box').show();
   }
 }
+

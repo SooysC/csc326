@@ -1,4 +1,4 @@
-% include('header.tpl', title='Page Title')
+% include('header.tpl', title='Home')
 
   <div id="wrapper">
     <p hidden id="curent_words"></p>

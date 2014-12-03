@@ -1,5 +1,5 @@
 <div hidden id="recommended-words">{{recommended_words}}</div>
-          
+
 %for index, (url, title) in enumerate(url_list):
   <div class="panel panel-info">
 
@@ -11,7 +11,9 @@
       </h3>
     </div>
     <div class="panel-body">
-      body..
+      %if user_email != '':
+          <button type="submit" name="pinButton" class="btn btn-warning pin-btn" value="{{url}}">Pin It</button>
+      %end
     </div>
   </div>
 %end
