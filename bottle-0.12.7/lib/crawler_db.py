@@ -78,10 +78,6 @@ def insert_pin_urls_to_db(email, url, db_file="../crawler/dbFile.db"):
     # Testing to see if it actually adds a lot of items to the table
     cur.execute('SELECT * FROM PinBoard')
     results = cur.fetchall()
-    print 'PinBoard:'
-    print '-' * 20
-    print results
-    print '-' * 20
     con.commit()
     con.close()
 

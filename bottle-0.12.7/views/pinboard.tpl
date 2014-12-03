@@ -11,13 +11,6 @@
           </a>
         </h3>
       </div>
-      <div class="panel-body">
-        %if user_email != '':
-            <form name="unpinForm" class="navbar-form navbar-left" method="post" action="unpinurl">
-              <button type="submit" id= "unpinButton "name="unpinButton" class="btn btn-warning" value="{{url}}">Unpin It</button>
-            </form>
-        %end
-      </div>
     </div>
   %end
 </div>

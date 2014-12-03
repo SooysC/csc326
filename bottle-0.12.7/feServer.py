@@ -110,12 +110,10 @@ def pinurl():
         email = session['user_email']
     except:
         email = ''
-    #print ">>>>body: ", request.body
     pinurl = request.forms.get('pinurl')
     print 'pinurl', pinurl
     crawler_db.insert_pin_urls_to_db(email, pinurl)
     return json.dumps({"statusCode": "false"})
-
 
 @route('/signin', method = 'GET')
 def signIn():
