@@ -8,15 +8,16 @@ $('#searchForm').submit(function(ev) {
   triggerNewSearch(words);
 });
 
-$('#pinForm').submit(function(ev) {
+$('#wrapper').on("click", ".pin-btn", function(ev) {
   ev.preventDefault(); // to stop the form from submitting
-  var pinurl = $('#searchForm :button[name=pinButton]').val();
-  console('pinurl:', pinurl);
+  var pinurl = $(this).attr('value');
+  console.log('pinurl: '+pinurl);
   triggerNewPin(pinurl);
 });
 
 function triggerNewPin(pinurl){
-  $.post("/pinurl", { pinurl: pinurl}, function(data){
+  $.post("/pinurl", {pinurl: pinurl}, function(data){
+    console.log("HELLO!!");
     console.log(data);
     if(data.statusCode == "false"){
       console.log('false');
@@ -24,7 +25,7 @@ function triggerNewPin(pinurl){
     }
     else
       alert('Try Pinning again');
-  }, "html");
+  }, "json");
 }
 
 $(window).scroll(function() {
@@ -69,7 +70,7 @@ function triggerNewSearch(words){
 
 
 function search(words, page_num, cb){
-  $.post( "/search", { words: words, page_num: page_num}, function(data){
+  $.post( "/search", {words: words, page_num: page_num}, function(data){
     cb(data);
   }, "html");
 }

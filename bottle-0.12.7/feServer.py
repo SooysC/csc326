@@ -101,6 +101,7 @@ def displayPinBoard():
                 )
         return "Relax! We are getting pins"
 
+
 @route('/pinurl', method = 'POST')
 def pinurl():
     session = request.environ.get('beaker.session')
@@ -108,11 +109,12 @@ def pinurl():
         email = session['user_email']
     except:
         email = ''
-    pinurl = request.forms.get('pinButton')
+    #print ">>>>body: ", request.body
+    pinurl = request.forms.get('pinurl')
     print 'pinurl', pinurl
     crawler_db.insert_pin_urls_to_db(email, pinurl)
-    #return output
-    return '{"statusCode": "false"}'
+    return json.dumps({"statusCode": "false"})
+
 
 @route('/signin', method = 'GET')
 def signIn():
