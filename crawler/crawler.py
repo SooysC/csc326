@@ -137,9 +137,7 @@ class crawler(object):
         self._db_cursor.execute('CREATE TABLE IF NOT EXISTS InvertedIndex(word_id INTEGER NOT NULL UNIQUE, doc_ids TEXT NOT NULL);')
         self._db_cursor.execute('CREATE TABLE IF NOT EXISTS PageRank(doc_id INTEGER NOT NULL UNIQUE, doc_rank FLOAT);')
         self._db_cursor.execute('CREATE TABLE IF NOT EXISTS DocIndex(doc_id INTEGER PRIMARY KEY, doc_url TEXT UNIQUE, doc_url_title TEXT);')
-        # this is the PinTable
-        self._db_cursor.execute('CREATE TABLE IF NOT EXISTS PinTable(id INTEGER PRIMARY KEY, email TEXT NOT NULL, doc_url TEXT UNIQUE, doc_url_title TEXT);')
-    
+
     def insert_document_to_db(self, url): # Erik Samprit
         """A function that inserts a url into a document db table
         and then returns that newly inserted document's id."""

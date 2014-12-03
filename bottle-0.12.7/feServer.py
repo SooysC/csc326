@@ -62,13 +62,6 @@ def redirect_page():
 
 @route('/search', method = 'POST')
 def search():
-    # get email
-    session = request.environ.get('beaker.session')
-    try:
-        email = session['user_email']
-    except:
-        email = ''
-
     words = request.forms.get('words')
     page_num = int(request.forms.get('page_num'))
     recommended_words, sorted_url_list = crawler_db.get_all_sorted_urls(words)
@@ -79,25 +72,10 @@ def search():
                 url_list = sorted_url_list[(page_num - 1) * URLS_PER_PAGE : (page_num - 1) * URLS_PER_PAGE + URLS_PER_PAGE],
                 page_num = page_num,
                 list_size = len(sorted_url_list),
-                recommended_words = recommended_words,
-                user_email = email
+                recommended_words = recommended_words
                 )
     return output;
 
-# TODO
-@route('/pinurl', method = 'POST')
-def pinURL():
-    session = request.environ.get('beaker.session')
-
-    try:
-        email = session['user_email']
-    except:
-        email = ''
-    pinurl = request.forms.get('pinurl')
-    print pinurl
-    crawler_db.store_url_on_pintable(email, pinurl)
-    
-    return pinurl
 
 @route('/signin', method = 'GET')
 def signIn():
@@ -122,10 +100,7 @@ def mainPage():
         email = ''
     output = template('homepage', user_email = email)
     return output
-@route('/pinboard', method = 'GET')
-def displayPinBoard():
-    output = template('pinboard', user_email = email)
-    return output
+
 
 if (env_server.is_aws()):
     run(app = app, host='0.0.0.0', port = 80) # for AWS EC2
