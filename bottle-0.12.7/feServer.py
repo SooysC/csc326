@@ -83,6 +83,7 @@ def search():
                 )
     return output;
 
+
 @route('/pinboard', method = 'POST')
 def displayPinBoard():
     session = request.environ.get('beaker.session')
@@ -99,7 +100,7 @@ def displayPinBoard():
                 pins = pins,
                 user_email = email
                 )
-        return "Relax! We are getting pins"
+        return output
 
 
 @route('/pinurl', method = 'POST')

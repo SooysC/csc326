@@ -11,7 +11,6 @@
       </h3>
     </div>
     <div class="panel-body">
-      body..
       %if user_email != '':
           <button type="submit" name="pinButton" class="btn btn-warning pin-btn" value="{{url}}">Pin It</button>
       %end
