@@ -11,16 +11,12 @@ $('#searchForm').submit(function(ev) {
 $('#wrapper').on("click", ".pin-btn", function(ev) {
   ev.preventDefault(); // to stop the form from submitting
   var pinurl = $(this).attr('value');
-  console.log('pinurl: '+pinurl);
   triggerNewPin(pinurl);
 });
 
 function triggerNewPin(pinurl){
   $.post("/pinurl", {pinurl: pinurl}, function(data){
-    console.log("HELLO!!");
-    console.log(data);
     if(data.statusCode == "false"){
-      console.log('false');
       $('#pinForm').hide();
     }
     else

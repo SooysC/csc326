@@ -14,10 +14,11 @@ URLS_TXT_FILE = "./crawler/urls.txt"
 def deploy():
 
     # run crawler
+    print "Please wait while we are recreating the database"
     os.system("rm -f %s" % DB_FILE)
     db_conn = lite.connect(DB_FILE)
     bot = crawler.crawler(db_conn, URLS_TXT_FILE)
-    bot.crawl(depth=1)
+    bot.crawl(depth=2)
     print "Crawler Finished"  #change to decorator
 
     # aws setup
@@ -26,6 +27,7 @@ def deploy():
     print "AWS Setup Finished"
 
     # scp
+    print "Please wait while we setup the app in AWS"
     os.system("rm -f ./bottle-0.12.7/data/") # delete cache for faster scp
     os.system("scp -r -o StrictHostKeyChecking=no -i %s ../csc326/ ubuntu@%s:~/" % (key_pair_path, public_ip))
     os.system("ssh -o StrictHostKeyChecking=no -i %s ubuntu@%s nohup python csc326/runner.py" % (key_pair_path, public_ip))
