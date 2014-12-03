@@ -13,7 +13,7 @@
     <div class="panel-body">
       body..
       %if user_email != '':
-          <form name="pinForm" class="navbar-form navbar-left" method="post" >
+          <form name="pinForm" class="navbar-form navbar-left" method="post" action="/pinurl">
             <button type="submit" id="pinButton" name="pinButton" class="btn btn-warning" value="{{url}}">Pin It</button>
           </form>
       %end 

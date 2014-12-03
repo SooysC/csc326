@@ -108,13 +108,11 @@ def pinurl():
         email = session['user_email']
     except:
         email = ''
-    pinurl = request.forms.get('pin_url')
-    print pinurl
+    pinurl = request.forms.get('pinButton')
+    print 'pinurl', pinurl
     crawler_db.insert_pin_urls_to_db(email, pinurl)
-    
-    # This is basically the body div with the Pin It button hidden
-    output = template( 'pin_response')
-    return output
+    #return output
+    return '{"statusCode": "false"}'
 
 @route('/signin', method = 'GET')
 def signIn():

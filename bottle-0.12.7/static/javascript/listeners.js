@@ -11,12 +11,19 @@ $('#searchForm').submit(function(ev) {
 $('#pinForm').submit(function(ev) {
   ev.preventDefault(); // to stop the form from submitting
   var pinurl = $('#searchForm :button[name=pinButton]').val();
+  console('pinurl:', pinurl);
   triggerNewPin(pinurl);
 });
 
 function triggerNewPin(pinurl){
-  $.post("/pinurl", { pin_url: pinurl}, function(data){
-    cb(data);
+  $.post("/pinurl", { pinurl: pinurl}, function(data){
+    console.log(data);
+    if(data.statusCode == "false"){
+      console.log('false');
+      $('#pinForm').hide();
+    }
+    else
+      alert('Try Pinning again');
   }, "html");
 }
 
